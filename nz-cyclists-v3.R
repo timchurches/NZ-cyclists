@@ -1,28 +1,38 @@
 /* nz-cyclists-v3.R
    Author: Tim Churches
    Date commenced: 16th July 2014
-   Purpose: show data used by Gilham in proper context and with unbiased linear interpolation
+   Purpose: show data used by Gillham in proper context and with unbiased linear interpolation
    Sources: as shown in comments
 */
 
+# The following fatality and police-reported cyclist injuries data is from the first table in http://www.transport.govt.nz/assets/Import/Documents_versions/3877/Cyclist-Crash-facts-2012.1.pdf - this is one of the data sources referenced on Gillham's web page at http://www.cycle-helmets.com/zealand_helmets.html
+  
 year <- 1988:2012
 fatalities <- c(NA,NA,27,22,17,17,15,15,13,12,16,8,19,10,14,6,7,12,9,12,10,8,10,9,NA)
 police.reported.injuries <- c(NA,NA,1054,1000,941,910,882,813,754,724,626,619,559,696,771,722,716,751,833,880,895,825,844,783,NA)
+
+# Gillham also used the following data:
+# Non=motor-vehicle cyclist injuries from http://ipru3.otago.ac.nz/niqs/index.php?ethnicity=&query_type=nonfatal&year_min=1988&year_max=2012&age_min=5&age_max=85&ecode=16&intent=&gender=&region_type=nz&dhb=&tla=&local_board=&report=year&submit=Produce+Report
 non.motor.vehicle.hosp <- c(1000,898,921,819,802,964,840,867,868,904,960,851,905,862,878,962,943,1026,1024,1146,1104,1189,1180,1078,1104)
+
+# Motor vehicle cyclist injuries from http://ipru3.otago.ac.nz/niqs/index.php?ethnicity=&query_type=nonfatal&year_min=1988&year_max=2012&age_min=5&age_max=85&ecode=13&intent=&gender=&region_type=nz&dhb=&tla=&local_board=&report=year&submit=Produce+Report
 motor.vehicle.hosp <- c(358,311,327,298,253,291,272,217,201,180,156,162,162,169,136,139,164,162,197,168,191,164,169,179,163)
 nz.pop.5yrs.plus <- c(3068620,3091186,3128430,3208500,3239820,3278160,3324730,3379040,3439070,3490580,3526110,3551560,3576800,3605810,3669980,3745630,3804200,3851490,3900690,3938390,3971080,4012270,4058360,4093180,4123720)
 
 # Tables 5,6 and 7 from http://www.transport.govt.nz/assets/Import/Documents/Cycling-2013.pdf
-library(zoo)
 survey.midpoints <- 1988:2012
 prop.cycling.surveys <- c(NA,8,NA,NA,NA,NA,NA,NA,NA,4,NA,NA,NA,NA,NA,3,3,NA,4,3,4,4,3,NA,NA)
 av.mins.cycling.surveys <- c(NA,15,NA,NA,NA,NA,NA,NA,NA,9,NA,NA,NA,NA,NA,7,7,NA,7,7,8,8,8,NA,NA)
 av.kms.cycling.surveys <- c(NA,2.2,NA,NA,NA,NA,NA,NA,NA,2.0,NA,NA,NA,NA,NA,1.3,1.3,NA,1.5,1.4,1.7,1.5,1.6,NA,NA)
 
+# Use the zoo library for irregular time-series
+library(zoo)
+
 prop.cycling.surveys.ts <- zoo(x=prop.cycling.surveys,order.by=survey.midpoints)
 av.mins.cycling.surveys.ts <- zoo(x=av.mins.cycling.surveys,order.by=survey.midpoints)
 av.kms.cycling.surveys.ts <- zoo(x=av.kms.cycling.surveys,order.by=survey.midpoints)
 
+# Use linear interpolation to fill in missing values in teh time-series, and to just replicate the earliest- and latest-available data at each end of the time-series, if missing.
 prop.cycling <- na.fill(prop.cycling.surveys.ts,"extend")
 av.mins.cycling <- na.fill(av.mins.cycling.surveys.ts,"extend")
 av.kms.cycling <- na.fill(av.kms.cycling.surveys.ts,"extend")
